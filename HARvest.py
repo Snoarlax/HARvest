@@ -21,8 +21,7 @@ def main():
     cookie_argparser.add_argument("--secure", "-se", action="store_true", help="Print the 'secure' value of set cookies.", default=False)
     cookie_argparser.add_argument("--samesite", "-ss", action="store_true", help="Print the 'samesite' value of set cookies.", default=False)
     cookie_argparser.add_argument("-v", "--verbose", action='count', help="produce more verbose output", default=0, required=False)
-    # TODO: implement the all flag
-    #cookie_argparser.add_argument("--all", "-si", action="store_true", help="Print the 'samesite' value of set cookies.", default=False)
+    cookie_argparser.add_argument("--all", "-a", action="store_true", help="Print all attributes of set cookies.", default=False)
 
 
     # Header mode
@@ -40,6 +39,12 @@ def main():
     args.func(args)
 
 def cookie_mode(args):
+    # If none of the cookie flags are set, default them all to true
+    if not (args.httponly or args.secure or args.samesite) or args.all:
+        args.samesite = True
+        args.secure = True
+        args.httponly = True
+
     json_content = read_file(args.filename)
     cookie_map = {"httponly":defaultdict(set),"secure":defaultdict(set),"samesite":defaultdict(set)}
     for entry in json_content["log"]["entries"]:
